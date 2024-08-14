@@ -1,17 +1,16 @@
+from typing import Optional
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import Response
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
-from starlette.responses import HTMLResponse, RedirectResponse
 from uvicorn import run as app_run
-from typing import Optional
+
 
 from insurance_structure.constant.application import APP_HOST, APP_PORT
-from insurance_structure.pipeline.prediction_pipline import (
-    HeartData, HeartStrokeClassifier
-)
+from insurance_structure.pipeline.prediction_pipline import HeartData, HeartStrokeClassifier
 from insurance_structure.pipeline.train_pipeline import TrainPipeline
+from insurance_structure.pipeline.prediction_pipline import HeartData
 
 app = FastAPI()
 
@@ -32,29 +31,38 @@ app.add_middleware(
 class DataForm:
     def __init__(self, request: Request):
         self.request: Request = request
-        self.gender: Optional[str] = None
-        self.age: Optional[str] = None
-        self.hypertension: Optional[str] = None
-        self.heart_disease: Optional[str] = None
-        self.ever_married: Optional[str] = None
-        self.work_type: Optional[str] = None
-        self.Residence_type: Optional[str] = None
-        self.avg_glucose_level: Optional[str] = None
-        self.smoking_status: Optional[str] = None
-        self.bmi: Optional[str] = None
+        self.sex: Optional[str] = None
+        self.age: Optional[int] = None
+        self.bmi: Optional[float] = None
+        self.children: Optional[int] = None
+        self.smoker: Optional[str] = None
+        self.region: Optional[str] = None
+        self.charges: Optional[float] = None
 
     async def get_stroke_data(self):
         form = await self.request.form()
-        self.gender = form.get("gender")
-        self.age = form.get("age")
-        self.hypertension = form.get("hypertension")
-        self.heart_disease = form.get("heart_disease")
-        self.ever_married = form.get("ever_married")
-        self.work_type = form.get("work_type")
-        self.Residence_type = form.get("Residence_type")
-        self.avg_glucose_level = form.get("avg_glucose_level")
-        self.smoking_status = form.get("smoking_status")
-        self.bmi = form.get("bmi")
+        
+        # Helper function to safely convert strings to floats
+        def safe_float(value: str, default: float) -> float:
+            try:
+                return float(value) if value else default
+            except ValueError:
+                return default
+        
+        # Helper function to safely convert strings to integers
+        def safe_int(value: str, default: int) -> int:
+            try:
+                return int(value) if value else default
+            except ValueError:
+                return default
+        
+        self.sex = form.get("sex")
+        self.age = safe_int(form.get("age", "0"), 0)  # Default to 0 if not provided
+        self.bmi = safe_float(form.get("bmi", "0.0"), 0.0)  # Default to 0.0 if not provided
+        self.children = safe_int(form.get("children", "0"), 0)  # Default to 0 if not provided
+        self.smoker = form.get("smoker")
+        self.region = form.get("region")
+        self.charges = safe_float(form.get("charges", "0.0"), 0.0)  # Default to 0.0 if not provided
 
 @app.get("/", tags=["authentication"])
 async def index(request: Request):
@@ -76,38 +84,31 @@ async def predictRouteClient(request: Request):
     try:
         form = DataForm(request)
         await form.get_stroke_data()
-
-        # Create HeartData object with correct columns
-        heart_stroke_data = HeartData(
-            gender=form.gender, 
-            age=int(form.age), 
-            hypertension=int(form.hypertension),
-            heart_disease=int(form.heart_disease), 
-            ever_married=form.ever_married, 
-            work_type=form.work_type, 
-            Residence_type=form.Residence_type, 
-            avg_glucose_level=float(form.avg_glucose_level),
-            bmi=float(form.bmi),
-            smoking_status=form.smoking_status
+        
+        # Create InsuranceData instance with the form data
+        insurance_data = HeartData(
+            sex=form.sex,
+            age=form.age,
+            bmi=form.bmi,
+            children=form.children,
+            smoker=form.smoker,
+            region=form.region,
+            charges=form.charges
         )
-
-        # Convert the input data to DataFrame for prediction
-        stroke_data_df = heart_stroke_data.get_heart_stroke_input_data_frame()
-
-        # Create an instance of the classifier
+        
+        # Convert the InsuranceData instance to DataFrame using the correct method
+        insurance_data_df = insurance_data.get_heart_stroke_input_data_frame()  # Correct method name
+        
+        # Predict using the InsuranceRegression model
         model_predictor = HeartStrokeClassifier()
+        prediction_result = model_predictor.predict(dataframe=insurance_data_df)
 
-        # Get the stroke prediction
-        stroke_value = model_predictor.predict(dataframe=stroke_data_df)
-
-        # Return the prediction result to the front-end
         return templates.TemplateResponse(
             "index.html",
-            {"request": request, "context": stroke_value},
+            {"request": request, "context": prediction_result},
         )
         
     except Exception as e:
         return {"status": False, "error": f"{e}"}
 
-if __name__ == "__main__":
-    app_run(app, host=APP_HOST, port=APP_PORT)
+
