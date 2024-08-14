@@ -1,6 +1,6 @@
 import os
-from heart_stroke.constant.training_pipeline import *
-from heart_stroke.constant.s3_bucket import TRAINING_BUCKET_NAME
+from insurance_structure.constant.training_pipeline import *
+from insurance_structure.constant.s3_bucket import TRAINING_BUCKET_NAME
 from pymongo import MongoClient
 from dataclasses import dataclass
 from datetime import datetime
@@ -25,7 +25,7 @@ class DataIngestionConfig:
     training_file_path: str = os.path.join(data_ingestion_dir, DATA_INGESTION_INGESTED_DIR, TRAIN_FILE_NAME)
     testing_file_path: str = os.path.join(data_ingestion_dir, DATA_INGESTION_INGESTED_DIR, TEST_FILE_NAME)
     train_test_split_ratio: float = DATA_INGESTION_TRAIN_TEST_SPLIT_RATION
-    collection_name:str = DATA_INGESTION_COLLECTION_NAME
+    collection_name: str = DATA_INGESTION_COLLECTION_NAME
 
 
 @dataclass
@@ -51,16 +51,15 @@ class DataTransformationConfig:
 class ModelTrainerConfig:
     model_trainer_dir: str = os.path.join(training_pipeline_config.artifact_dir, MODEL_TRAINER_DIR_NAME)
     trained_model_file_path: str = os.path.join(model_trainer_dir, MODEL_TRAINER_TRAINED_MODEL_DIR, MODEL_FILE_NAME)
-    expected_accuracy: float = MODEL_TRAINER_EXPECTED_SCORE
+    expected_score: float = MODEL_TRAINER_EXPECTED_SCORE  # Update name to reflect regression metric
     model_config_file_path: str = MODEL_TRAINER_MODEL_CONFIG_FILE_PATH
 
 
 @dataclass
 class ModelEvaluationConfig:
-    changed_threshold_score: float = MODEL_EVALUATION_CHANGED_THRESHOLD_SCORE
+    changed_threshold_score: float = MODEL_EVALUATION_CHANGED_THRESHOLD_SCORE  # Ensure this is relevant for regression
     bucket_name: str = MODEL_PUSHER_BUCKET_NAME
     s3_model_key_path: str = "heart-stroke-model.pkl"
-
 
 
 @dataclass

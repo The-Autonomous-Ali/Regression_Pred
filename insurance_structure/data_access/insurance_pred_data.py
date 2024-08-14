@@ -4,9 +4,9 @@ from typing import Optional
 
 import numpy as np
 import pandas as pd
-from heart_stroke.configuration.mongo_db_connection import MongoDBClient
-from heart_stroke.constant.database import DATABASE_NAME
-from heart_stroke.exception import HeartStrokeException
+from insurance_structure.configuration.mongo_db_connection import MongoDBClient
+from insurance_structure.constant.database import DATABASE_NAME
+from insurance_structure.exception import InsurancePriceException
 
 
 class InsuranceData:
@@ -20,7 +20,7 @@ class InsuranceData:
             self.mongo_client = MongoDBClient(database_name=DATABASE_NAME)
             
         except Exception as e:
-            raise HeartStrokeException(e, sys) from e
+            raise InsurancePriceException(e, sys) from e
 
     def export_collection_as_dataframe(self, collection_name: str, 
                                        database_name: Optional[str] = None) -> pd.DataFrame:
@@ -39,4 +39,4 @@ class InsuranceData:
             return df
         
         except Exception as e:
-            raise HeartStrokeException(e, sys) from e
+            raise InsurancePriceException(e, sys) from e

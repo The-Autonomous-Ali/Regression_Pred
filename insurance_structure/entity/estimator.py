@@ -3,8 +3,8 @@ import sys
 from dataclasses import dataclass
 
 from pandas import DataFrame
-from heart_stroke.exception import HeartStrokeException
-from heart_stroke.logger import logging
+from insurance_structure.exception import InsurancePriceException
+from insurance_structure.logger import logging
 from sklearn.compose import ColumnTransformer
 
 
@@ -34,7 +34,7 @@ class InsurancePredModel:
             return self.trained_model_object.predict(transformed_feature)
 
         except Exception as e:
-            raise HeartStrokeException(e, sys) from e
+            raise InsurancePriceException(e, sys) from e
 
     def __repr__(self):
         return f"{type(self.trained_model_object).__name__}()"

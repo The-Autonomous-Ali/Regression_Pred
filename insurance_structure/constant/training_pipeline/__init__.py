@@ -1,14 +1,14 @@
 # pipeline name and root directory constant
 import os
-from heart_stroke.constant.s3_bucket import TRAINING_BUCKET_NAME
+from insurance_structure.constant.s3_bucket import TRAINING_BUCKET_NAME
 
-TARGET_COLUMN = "stroke"
-PIPELINE_NAME: str = "heart_stroke"
+TARGET_COLUMN = "charges"
+PIPELINE_NAME: str = "Insurance-predictior"
 ARTIFACT_DIR: str = "artifact"
 
 # common file name
 
-FILE_NAME: str = "heart_stroke.csv"
+FILE_NAME: str = "insurance.csv"
 TRAIN_FILE_NAME: str = "train.csv"
 TEST_FILE_NAME: str = "test.csv"
 PREPROCSSING_OBJECT_FILE_NAME = "preprocessing.pkl"
@@ -18,7 +18,7 @@ SCHEMA_FILE_PATH = os.path.join("config", "schema.yaml")
 """
 Data Ingestion related constant start with DATA_INGESTION VAR NAME
 """
-DATA_INGESTION_COLLECTION_NAME: str = "heart_stroke"
+DATA_INGESTION_COLLECTION_NAME: str = "insurance_data"
 DATA_INGESTION_DIR_NAME: str = "data_ingestion"
 DATA_INGESTION_FEATURE_STORE_DIR: str = "feature_store"
 DATA_INGESTION_INGESTED_DIR: str = "ingested"

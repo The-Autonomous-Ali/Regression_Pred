@@ -1,9 +1,9 @@
 import os
 import sys
 
-from heart_stroke.cloud_storage.aws_storage import SimpleStorageService
-from heart_stroke.entity.estimator import HeartStrokeModel
-from heart_stroke.exception import HeartStrokeException
+from insurance_structure.cloud_storage.aws_storage import SimpleStorageService
+from insurance_structure.entity.estimator import InsurancePredModel
+from insurance_structure.exception import InsurancePriceException
 from pandas import DataFrame
 
 
@@ -20,17 +20,17 @@ class InsurancePriceEstimator:
         self.bucket_name = bucket_name
         self.s3 = SimpleStorageService()
         self.model_path = model_path
-        self.loaded_model:HeartStrokeModel=None
+        self.loaded_model:InsurancePredModel=None
 
 
     def is_model_present(self,model_path):
         try:
             return self.s3.s3_key_path_available(bucket_name=self.bucket_name, s3_key=model_path)
-        except HeartStrokeException as e:
+        except InsurancePriceException as e:
             print(e)
             return False
 
-    def load_model(self,)->HeartStrokeModel:
+    def load_model(self,)->InsurancePredModel:
         """
         Load the model from the model_path
         :return:
@@ -51,7 +51,7 @@ class InsurancePriceEstimator:
                                 remove=remove
                                 )
         except Exception as e:
-            raise HeartStrokeException(e, sys)
+            raise InsurancePriceException(e, sys)
 
 
     def predict(self,dataframe:DataFrame):
@@ -64,4 +64,4 @@ class InsurancePriceEstimator:
                 self.loaded_model = self.load_model()
             return self.loaded_model.predict(dataframe=dataframe)
         except Exception as e:
-            raise HeartStrokeException(e, sys)
+            raise InsurancePriceException(e, sys)

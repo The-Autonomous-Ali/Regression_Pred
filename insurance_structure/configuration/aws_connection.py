@@ -1,6 +1,6 @@
 import boto3
 import os
-from heart_stroke.constant.env_variable import (
+from insurance_structure.constant.env_variable import (
     AWS_SECRET_ACCESS_KEY_ENV_KEY,
     AWS_ACCESS_KEY_ID_ENV_KEY,
     REGION_NAME,

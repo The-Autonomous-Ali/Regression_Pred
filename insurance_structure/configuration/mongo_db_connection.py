@@ -1,27 +1,19 @@
 import os
 import sys
-from json import loads
-
 import certifi
 import pymongo
-from heart_stroke.constant.database import DATABASE_NAME
-from heart_stroke.constant.env_variable import MONGODB_URL_KEY
-from heart_stroke.exception import HeartStrokeException
-from heart_stroke.logger import logging
-from pandas import DataFrame
 from pymongo import MongoClient
-from pymongo.collection import Collection
-from pymongo.database import Database
+from insurance_structure.constant.database import DATABASE_NAME
+from insurance_structure.constant.env_variable import MONGODB_URL_KEY
+from insurance_structure.exception import InsurancePriceException
+from insurance_structure.logger import logging
 
 ca = certifi.where()
 
 class MongoDBClient:
     """
-    Class Name :   export_data_into_feature_store
-    Description :   This method exports the dataframe from mongodb feature store as dataframe 
-    
-    Output      :   connection to mongodb database
-    On Failure  :   raises an exception
+    Class Name :   MongoDBClient
+    Description :   This class connects to MongoDB and provides access to the database.
     """
     client = None
 
@@ -31,9 +23,17 @@ class MongoDBClient:
                 mongo_db_url = os.getenv(MONGODB_URL_KEY)
                 if mongo_db_url is None:
                     raise Exception(f"Environment key: {MONGODB_URL_KEY} is not set.")
+                logging.info(f"Connecting to MongoDB at {mongo_db_url}")
                 MongoDBClient.client = pymongo.MongoClient(mongo_db_url, tlsCAFile=ca)
             self.client = MongoDBClient.client
             self.database = self.client[database_name]
             self.database_name = database_name
+        except pymongo.errors.ServerSelectionTimeoutError as e:
+            logging.error(f"Server Selection Timeout Error: {e}")
+            raise InsurancePriceException(e, sys) from e
+        except pymongo.errors.ConnectionError as e:
+            logging.error(f"Connection Error: {e}")
+            raise InsurancePriceException(e, sys) from e
         except Exception as e:
-            raise HeartStrokeException(e, sys) from e 
+            logging.error(f"General Error: {e}")
+            raise InsurancePriceException(e, sys) from e

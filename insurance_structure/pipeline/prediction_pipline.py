@@ -2,12 +2,12 @@ import logging
 import os
 import sys
 
-from heart_stroke.constant.training_pipeline import SCHEMA_FILE_PATH
-from heart_stroke.entity.config_entity import StrokePredictorConfig
-from heart_stroke.entity.s3_estimator import StrokeEstimator
-from heart_stroke.exception import HeartStrokeException
-from heart_stroke.logger import logging
-from heart_stroke.utils.main_utils import read_yaml_file
+from insurance_structure.constant.training_pipeline import SCHEMA_FILE_PATH
+from insurance_structure.entity.config_entity import StrokePredictorConfig
+from insurance_structure.entity.s3_estimator import InsurancePriceEstimator
+from insurance_structure.exception import InsurancePriceException
+from insurance_structure.logger import logging
+from insurance_structure.utils.main_utils import read_yaml_file
 from pandas import DataFrame
 
 
@@ -42,7 +42,7 @@ class HeartData:
             self.smoking_status = smoking_status
 
         except Exception as e:
-            raise HeartStrokeException(e, sys) from e
+            raise InsurancePriceException(e, sys) from e
 
     def get_heart_stroke_input_data_frame(self)-> DataFrame:
         """
@@ -54,7 +54,7 @@ class HeartData:
             return DataFrame(heart_stroke_input_dict)
         
         except Exception as e:
-            raise HeartStrokeException(e, sys) from e
+            raise InsurancePriceException(e, sys) from e
 
     def get_heart_stroke_data_as_dict(self)-> dict:
         """
@@ -76,7 +76,7 @@ class HeartData:
             return input_data
         
         except Exception as e:
-            raise HeartStrokeException(e, sys)
+            raise InsurancePriceException(e, sys)
 
 class HeartStrokeClassifier:
     def __init__(self,prediction_pipeline_config: StrokePredictorConfig = StrokePredictorConfig(),) -> None:
@@ -87,7 +87,7 @@ class HeartStrokeClassifier:
             self.schema_config = read_yaml_file(SCHEMA_FILE_PATH)
             self.prediction_pipeline_config = prediction_pipeline_config
         except Exception as e:
-            raise HeartStrokeException(e, sys)
+            raise InsurancePriceException(e, sys)
 
     def predict(self, dataframe) -> str:
         """
@@ -96,7 +96,7 @@ class HeartStrokeClassifier:
         """
         try:
             logging.info("Entered predict method of HeartStrokeClassifier class")
-            model = StrokeEstimator(
+            model = InsurancePriceEstimator(
                 bucket_name=self.prediction_pipeline_config.model_bucket_name,
                 model_path=self.prediction_pipeline_config.model_file_path,
             )
@@ -108,4 +108,4 @@ class HeartStrokeClassifier:
                 return "Low chance of Heart stroke"
         
         except Exception as e:
-            raise HeartStrokeException(e, sys)
+            raise InsurancePriceException(e, sys)

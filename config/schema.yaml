@@ -1,0 +1,38 @@
+columns:
+  age: int
+  sex: category
+  bmi: float
+  children: int
+  smoker: category
+  region: category
+  charges: float
+
+# for data validation 
+numerical_columns:
+   - age
+   - bmi
+   - children
+   - charges
+
+categorical_columns:
+    - sex
+    - smoker
+    - region
+
+# for data transformation
+Numerical_columns:
+  - age
+  - bmi
+  - children
+
+Categorical_columns:
+  - sex
+  - smoker
+  - region
+
+Transformation_columns:
+  - charges
+
+Drop_columns: []
+
+Target_column: charges

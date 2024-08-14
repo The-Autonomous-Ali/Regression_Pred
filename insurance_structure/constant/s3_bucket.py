@@ -1,1 +1,1 @@
-TRAINING_BUCKET_NAME = "heart-stroke"
+TRAINING_BUCKET_NAME = "heart-stroke1"

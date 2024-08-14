@@ -22,16 +22,17 @@ class DataTransformationArtifact:
 
 
 @dataclass
-class ClassificationMetricArtifact:
-    f1_score: float
-    precision_score: float
-    recall_score: float
+class RegressionMetricArtifact:
+    r2_score: float
+    mae: float
+    mse: float
+    rmse: float
 
 
 @dataclass
 class ModelTrainerArtifact:
     trained_model_file_path: str
-    metric_artifact: ClassificationMetricArtifact
+    metric_artifact: RegressionMetricArtifact
 
 
 @dataclass

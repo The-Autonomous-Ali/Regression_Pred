@@ -1,2 +1,2 @@
-DATABASE_NAME = "ineuron"
-COLLECTION_NAME = "heart_stroke"
+DATABASE_NAME = "Billing"
+COLLECTION_NAME = "insurance_data"

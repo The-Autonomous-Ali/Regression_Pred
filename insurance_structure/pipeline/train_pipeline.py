@@ -1,26 +1,26 @@
 import sys
 from typing import Tuple
 
-from heart_stroke.components.data_ingestion import DataIngestion
-from heart_stroke.components.data_transformation import DataTransformation
-from heart_stroke.components.data_validation import DataValidation
-from heart_stroke.components.model_evaluation import ModelEvaluation
-from heart_stroke.components.model_pusher import ModelPusher
-from heart_stroke.components.model_trainer import ModelTrainer
-from heart_stroke.entity.artifact_entity import (DataIngestionArtifact,
+from insurance_structure.components.data_ingestion import DataIngestion
+from insurance_structure.components.data_transformation import DataTransformation
+from insurance_structure.components.data_validation import DataValidation
+from insurance_structure.components.model_evaluation import ModelEvaluation
+from insurance_structure.components.model_pusher import ModelPusher
+from insurance_structure.components.model_trainer import ModelTrainer
+from insurance_structure.entity.artifact_entity import (DataIngestionArtifact,
                                                  DataTransformationArtifact,
                                                  DataValidationArtifact,
                                                  ModelEvaluationArtifact,
                                                  ModelPusherArtifact,
                                                  ModelTrainerArtifact)
-from heart_stroke.entity.config_entity import (DataIngestionConfig,
+from insurance_structure.entity.config_entity import (DataIngestionConfig,
                                                DataTransformationConfig,
                                                DataValidationConfig,
                                                ModelEvaluationConfig,
                                                ModelPusherConfig,
                                                ModelTrainerConfig)
-from heart_stroke.exception import HeartStrokeException
-from heart_stroke.logger import logging
+from insurance_structure.exception import InsurancePriceException
+from insurance_structure.logger import logging
 from pandas import DataFrame
 
 
@@ -34,9 +34,6 @@ class TrainPipeline:
         self.model_pusher_config = ModelPusherConfig()
 
     def start_data_ingestion(self) -> DataIngestionArtifact:
-        """
-        This method of TrainPipeline class is responsible for starting data ingestion component
-        """
         try:
             logging.info(
                 "Entered the start_data_ingestion method of TrainPipeline class"
@@ -52,12 +49,9 @@ class TrainPipeline:
             )
             return data_ingestion_artifact
         except Exception as e:
-            raise HeartStrokeException(e, sys) from e
+            raise InsurancePriceException(e, sys) from e
 
     def start_data_validation(self, data_ingestion_artifact: DataIngestionArtifact) -> DataValidationArtifact:
-        """
-        This method of TrainPipeline class is responsible for starting data validation component 
-        """
         logging.info("Entered the start_data_validation method of TrainPipeline class")
 
         try:
@@ -77,13 +71,10 @@ class TrainPipeline:
             return data_validation_artifact
 
         except Exception as e:
-            raise HeartStrokeException(e, sys) from e
+            raise InsurancePriceException(e, sys) from e
 
     def start_data_transformation(self, data_ingestion_artifact: DataIngestionArtifact,
                                   data_validation_artifact: DataValidationArtifact) -> DataTransformationArtifact:
-        """
-        This method of TrainPipeline class is responsible for starting data transformation  
-        """
         try:
             data_transformation = DataTransformation(
                 data_ingestion_artifact=data_ingestion_artifact,
@@ -95,12 +86,9 @@ class TrainPipeline:
             )
             return data_transformation_artifact
         except Exception as e:
-            raise HeartStrokeException(e, sys) from e
+            raise InsurancePriceException(e, sys) from e
 
     def start_model_trainer(self, data_transformation_artifact: DataTransformationArtifact) -> ModelTrainerArtifact:
-        """
-        This method of TrainPipeline class is responsible for starting model trainer component
-        """
         try:
             model_trainer = ModelTrainer(
                 data_transformation_artifact=data_transformation_artifact,
@@ -110,13 +98,10 @@ class TrainPipeline:
             return model_trainer_artifact
 
         except Exception as e:
-            raise HeartStrokeException(e, sys) from e
+            raise InsurancePriceException(e, sys) from e
 
     def start_model_evaluation(self,data_ingestion_artifact: DataIngestionArtifact,
                                model_trainer_artifact: ModelTrainerArtifact,) -> ModelEvaluationArtifact:
-        """
-        This method of TrainPipeline class is responsible for starting model evaluation component
-        """
         try:
             model_evaluation = ModelEvaluation(
                 model_eval_config=self.model_evaluation_config,
@@ -126,12 +111,9 @@ class TrainPipeline:
             model_evaluation_artifact = model_evaluation.initiate_model_evaluation()
             return model_evaluation_artifact
         except Exception as e:
-            raise HeartStrokeException(e, sys) from e
+            raise InsurancePriceException(e, sys) from e
 
     def start_model_pusher(self, model_trainer_artifact: ModelTrainerArtifact,):
-        """
-        This method of TrainPipeline class is responsible for starting model pusher component
-        """
         try:
             model_pusher = ModelPusher( 
                 model_trainer_artifact=model_trainer_artifact,
@@ -140,12 +122,9 @@ class TrainPipeline:
             model_pusher_artifact = model_pusher.initiate_model_pusher()
             return model_pusher_artifact
         except Exception as e:
-            raise HeartStrokeException(e, sys) from e
+            raise InsurancePriceException(e, sys) from e
 
     def run_pipeline(self,) -> None:
-        """
-        This method of TrainPipeline class is responsible for running complete pipeline
-        """
         try:
             data_ingestion_artifact = self.start_data_ingestion()
             data_validation_artifact = self.start_data_validation(data_ingestion_artifact=data_ingestion_artifact)
@@ -161,4 +140,14 @@ class TrainPipeline:
                 model_trainer_artifact=model_trainer_artifact
             )
         except Exception as e:
-            raise HeartStrokeException(e, sys) from e
+            raise InsurancePriceException(e, sys) from e
+
+
+if __name__ == "__main__":
+    print("TrainPipeline script is running...")
+    try:
+        train_pipeline = TrainPipeline()
+        train_pipeline.run_pipeline()
+    except Exception as e:
+        logging.error(f"Error occurred: {e}")
+        raise e
